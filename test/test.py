@@ -8,14 +8,11 @@ from cocotb.triggers import ClockCycles
 
 @cocotb.test()
 async def test_project(dut):
-    dut._log.info("Start")
 
-    # Set the clock period to 10 us (100 KHz)
-    clock = Clock(dut.clk, 10, units="us")
+    # Set the clock period to 40 us (25 MHz)
+    clock = Clock(dut.clk, 40, units="ns")
     cocotb.start_soon(clock.start())
 
-    # Reset
-    dut._log.info("Reset")
     dut.ena.value = 1
     dut.ui_in.value = 0
     dut.uio_in.value = 0
@@ -23,18 +20,43 @@ async def test_project(dut):
     await ClockCycles(dut.clk, 10)
     dut.rst_n.value = 1
 
-    dut._log.info("Test project behavior")
+    # Basic check for valid vga sync signals
+    dut._log.info("Waiting for hsync and vsync being both zero")
+    for i in range(420000):
+        await ClockCycles(dut.clk, 1)
+        hsync = dut.uo_out[7].value.integer
+        vsync = dut.uo_out[3].value.integer
+        if hsync == 0 and vsync == 0:
+            break
+    else:
+        assert False, "hsync and vsync are never both zero"
 
-    # Set the input values you want to test
-    dut.ui_in.value = 20
-    dut.uio_in.value = 30
+    dut._log.info("Waiting for hsync and vsync being both one")
+    for i in range(420000):
+        await ClockCycles(dut.clk, 1)
+        hsync = dut.uo_out[7].value.integer
+        vsync = dut.uo_out[3].value.integer
+        if hsync == 1 and vsync == 1:
+            break
+    else:
+        assert False, "hsync and vsync are never both one"
 
-    # Wait for one clock cycle to see the output values
-    await ClockCycles(dut.clk, 1)
+    dut._log.info("Verifying hsync and vsync data")
+    for i in range(525):
+        hsync_row = []
+        vsync_row = []
+        dut._log.info(f"Line {i}")
+        for j in range(800):
+            hsync_row.append(dut.uo_out[7].value.integer)
+            vsync_row.append(dut.uo_out[3].value.integer)
+            await ClockCycles(dut.clk, 1)
+        assert hsync_row == [1] * 96 + [0] * 704, "Unexpected hsync data"
+        if i == 0:
+            assert vsync_row == [1] * 800, "Unexpected vsync data in first line"
+        elif i == 1:
+            assert vsync_row == [1] * 144 + [0] * 656, "Unexpected vsync data in second line"
+        elif i == 524:
+            assert vsync_row == [0] * 144 + [1] * 656, "Unexpected vsync data in last line"
+        else:
+            assert vsync_row == [0] * 800, "Unexpected vsync data"
 
-    # The following assersion is just an example of how to check the output values.
-    # Change it to match the actual expected output of your module:
-    assert dut.uo_out.value == 50
-
-    # Keep testing the module by changing the input values, waiting for
-    # one or more clock cycles, and asserting the expected output values.
