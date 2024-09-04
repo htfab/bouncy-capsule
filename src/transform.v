@@ -7,11 +7,8 @@ module transform(
     input wire [9:0] vga_y,
     input wire [9:0] center_x,
     input wire [9:0] center_y,
-    input wire [5:0] dx,     // p_x = center_x + dx, q_x = center_x - dx
-    input wire [5:0] dy,     // p_y = center_y + dy, q_y = center_y - dy, dx^2 + dy^2 = 64^2
-    input wire [11:0] dx_s,  // = dx^2
-    input wire [10:0] dx_dy, // = dx*dy
-    input wire [11:0] dy_s,  // = dy^2
+    input wire [5:0] dx,
+    input wire [5:0] dy,
     input wire flip_x,
     input wire flip_y,
     output wire [9:0] out_x,

@@ -100,9 +100,6 @@ wire [9:0] center_x;
 wire [9:0] center_y;
 wire [5:0] dx;
 wire [5:0] dy;
-wire [11:0] dx_s;
-wire [10:0] dx_dy;
-wire [11:0] dy_s;
 
 kinematics i_kinematics(
     .clk(clk),
@@ -118,10 +115,7 @@ kinematics i_kinematics(
     .center_x(center_x),
     .center_y(center_y),
     .dx(dx),
-    .dy(dy),
-    .dx_s(dx_s),
-    .dx_dy(dx_dy),
-    .dy_s(dy_s)
+    .dy(dy)
 );
 
 wire [9:0] tf_x;
@@ -137,9 +131,6 @@ transform i_transform(
     .center_y(center_y),
     .dx(dx),
     .dy(dy),
-    .dx_s(dx_s),
-    .dx_dy(dx_dy),
-    .dy_s(dy_s),
     .flip_x(phi[2] ^ phi[1] ^ orient),
     .flip_y(phi[2] ^ orient),
     .out_x(tf_x),
