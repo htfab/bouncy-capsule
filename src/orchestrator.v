@@ -36,19 +36,23 @@ assign color_entropy = lfsr[9:8];
 
 always @(posedge clk) begin
     update_collision <= 0;
-    update_kinematics <= 0;
-    update_transform <= 0;
     rotate_collision <= 0;
     mirror_collision <= 0;
+    update_kinematics <= 0;
+    update_transform <= 0;
+    update_resonator <= 0;
     handle_impact <= 0;
     trigger_resonator <= 0;
-    update_resonator <= 0;
     if(rst) begin
+        hit_left <= 0;
+        hit_right <= 0;
+        hit_top <= 0;
+        hit_bottom <= 0;
         lfsr <= -1;
         hit_priority <= 0;
         trigger_debounce <= 0;
-        tension <= 0;
         sample_counter <= 0;
+        tension <= 0;
     end else begin
         if(vga_y == 480 && vga_x == 0) begin
             lfsr <= {lfsr[8:0], ^(lfsr & 10'b1001000000)};
