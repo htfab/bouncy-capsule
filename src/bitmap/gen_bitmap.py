@@ -30,7 +30,7 @@ always @(*) begin
 """)
 
 for i, j in enumerate(bm):
-    f.write(f"        {log_size}'b" + bin(i)[2:].rjust(log_size, '0') + ":out = 1'b" + str(j) + ";\n")
+    f.write(f"        {log_size}'b" + bin(i)[2:].rjust(log_size, '0') + ": out = 1'b" + str(j) + ";\n")
 
 f.write("""    endcase
 end

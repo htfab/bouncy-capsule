@@ -28,7 +28,7 @@ reg hit_top;
 reg hit_bottom;
 reg [9:0] lfsr;
 reg [1:0] hit_priority;
-reg [3:0] trigger_counter;
+reg [1:0] trigger_counter;
 reg [9:0] sample_counter;
 
 assign round_dir = lfsr[0];
@@ -68,8 +68,24 @@ always @(posedge clk) begin
             end
             hit_priority <= hit_priority + 1;
         end else if(vga_y == 485 && vga_x == 0) begin
-            update_kinematics <= ~pause_kinematics;
+            if(hit_bottom || hit_left || hit_right || hit_top) begin
+                if(collision_impact != 0) begin
+                    if(trigger_counter == 0) begin
+                        handle_impact <= 1;
+                        if(!mute_sound) trigger_resonator <= collision_impact;
+                        if(hit_bottom)     tension <= 4;
+                        else if(hit_left)  tension <= 6;
+                        else if(hit_right) tension <= 10;
+                        else if(hit_top)   tension <= 14;
+                    end
+                    trigger_counter <= 3;
+                end
+            end else begin
+                if(trigger_counter != 0) trigger_counter <= trigger_counter - 1;
+            end
         end else if(vga_y == 490 && vga_x == 0) begin
+            update_kinematics <= ~pause_kinematics;
+        end else if(vga_y == 495 && vga_x == 0) begin
             update_transform <= 1;
             hit_left <= 0;
             hit_right <= 0;
@@ -85,24 +101,9 @@ always @(posedge clk) begin
             if(capsule_hit) hit_top <= 1;
         end
 
-        if(hit_bottom || hit_left || hit_right || hit_top) begin
-            if(collision_impact != 0) begin
-                trigger_counter <= 15;
-                if(trigger_counter == 0) begin
-                    handle_impact <= 1;
-                    if(!mute_sound) trigger_resonator <= collision_impact;
-                    if(hit_bottom)     tension <= 4;
-                    else if(hit_left)  tension <= 6;
-                    else if(hit_right) tension <= 10;
-                    else if(hit_top)   tension <= 14;
-                end
-            end
-        end else begin
-            sample_counter <= sample_counter + 1;
-            if(sample_counter == 0) begin
-                update_resonator <= 1;
-                if(trigger_counter != 0) trigger_counter <= trigger_counter - 1;
-            end
+        sample_counter <= sample_counter + 1;
+        if(sample_counter == 0) begin
+            update_resonator <= 1;
         end
 
     end

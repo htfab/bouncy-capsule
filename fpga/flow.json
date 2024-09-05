@@ -7,6 +7,7 @@
         "sources": [
             "../src/arc_table.v",
             "../src/sine_table.v",
+            "../src/coll_table.v",
             "../src/capsule.v",
             "../src/bitmap.v",
             "../src/colors.v",

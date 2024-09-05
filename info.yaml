@@ -19,6 +19,7 @@ project:
   source_files:
     - "arc_table.v"
     - "sine_table.v"
+    - "coll_table.v"
     - "capsule.v"
     - "bitmap.v"
     - "colors.v"
