@@ -3,7 +3,7 @@
 module resonator (
     input wire clk,
     input wire rst,
-    input wire [2:0] trigger,
+    input wire [1:0] trigger,
     input wire update,
     input wire [3:0] tension,
     output wire [11:0] sample
@@ -25,7 +25,7 @@ always @(posedge clk) begin
         counter <= 0;
     end else if(trigger != 0) begin
         v <= 0;
-        x <= {1'b0, trigger, {(8){1'b1}}};
+        x <= {1'b0, {(5){trigger}}, trigger[1]};
         counter <= 0;
     end else if(update) begin
         if((&v[15:13] || ~|v[15:13]) && (&x[11:9] || ~|x[11:9])) begin

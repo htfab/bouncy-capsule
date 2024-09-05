@@ -32,50 +32,18 @@ def collision_response(vs, v, ws, w, phi, rd):
     else:
         vr = int(ceil(vo))
     wr = v+w - vr
-    impact = min(max(round(1.388 * j), 1 if j > 1e-6 else 0), 7)
+    impact = min(max(round(0.647 * j), 1 if j > 1e-6 else 0), 3)
     return (vos, vr, wos, wr, impact)
-
-
-def collision_response_orig(vs, v, ws, w, phi, rd):
-    d = [1, 0, 0, 1][phi % 4]
-    ds = [0, 0, 1, 1][phi % 4]
-
-    if (ws^ds if (d and ((v == 0 and w >= 1) or (v == 1 and w >= 3))) else vs):
-        return (vs, v, ws, w, 0)
-
-    if ds ^ vs ^ ws:
-        if d and w == 0 and v >= 2:
-            wn = v - 2
-            vn = 1
-        else:
-            wn = max(v + w - 1, 0)
-            vn = 0
-    else:
-        if d and v == 0 and w >= 2:
-            vn = w - 2
-            wn = 1
-        else:
-            vn = max(v + w - 1, 0)
-            wn = 0
-
-    vns = ws^ds^1 if (d or ((v == 0 and w >= 1) or (v == 1 and w >= 3))) else vs^1
-    wns = vs^ds^1 if (d or ((w == 0 and v >= 1) or (w == 1 and v >= 3))) else ws
-    if v > 0 or w > 0:
-        wn += rd
-        vn += 1-rd
-    impact = 2*(v+w) + 1
-    return (vns, vn, wns, wn, impact)
-
 
 cmap = {}
 for v, w, phi in itertools.product(range(4), repeat=3):
     for vs, ws, rd in itertools.product(range(2), repeat=3):
         inp = f'{vs:01b}_{v:02b}_{ws:01b}_{w:02b}_{phi:02b}_{rd:01b}'
         if v + w > 3:
-            out = 'x_xx_x_xx_xxx'
+            out = 'x_xx_x_xx_xx'
         else:
             vos, vr, wos, wr, impact = collision_response(vs, v, ws, w, phi, rd)
-            out = f'{vos:01b}_{vr:02b}_{wos:01b}_{wr:02b}_{impact:03b}'
+            out = f'{vos:01b}_{vr:02b}_{wos:01b}_{wr:02b}_{impact:02b}'
         cmap[inp] = out
 
 f = open('../coll_table.v', 'w')
@@ -84,7 +52,7 @@ f.write(f"""`default_nettype none
 
 module coll_table(
     input wire [8:0] in,
-    output reg [8:0] out
+    output reg [7:0] out
 );
 
 always @(*) begin
@@ -92,7 +60,7 @@ always @(*) begin
 """)
 
 for i, j in sorted(cmap.items()):
-  f.write(f"        9'b{i}: out = 9'b{j};\n")
+  f.write(f"        9'b{i}: out = 8'b{j};\n")
 
 f.write("""    endcase
 end

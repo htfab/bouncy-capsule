@@ -39,7 +39,7 @@ vga_beam i_vga_beam(
 );
 
 wire capsule_hit;
-wire [2:0] collision_impact;
+wire [1:0] collision_impact;
 wire update_collision;
 wire rotate_collision;
 wire mirror_collision;
@@ -47,7 +47,7 @@ wire update_kinematics;
 wire update_transform;
 wire update_resonator;
 wire handle_impact;
-wire [2:0] trigger_resonator;
+wire [1:0] trigger_resonator;
 wire [3:0] tension;
 wire round_dir;
 wire [1:0] color_entropy;

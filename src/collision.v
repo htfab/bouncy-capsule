@@ -14,13 +14,13 @@ module collision(
     output wire [5:0] vxt,
     output wire [5:0] vyt,
     output wire [5:0] wt,
-    output wire [2:0] impact
+    output wire [1:0] impact
 );
 
 reg [2:0] vx;
 reg [2:0] vy;
 reg [2:0] w;
-reg [2:0] imp;
+reg [1:0] imp;
 
 wire [1:0] phi_rot = rotate ? (phi + 2) : phi;
 wire vs = rotate ? (mirror ? ~vx[2] : vx[2]) : (mirror ? ~vy[2] : vy[2]);
@@ -32,7 +32,7 @@ wire vsn;
 wire [1:0] vmn;
 wire wsn;
 wire [1:0] wmn;
-wire [2:0] impn;
+wire [1:0] impn;
 
 coll_table i_coll_table(
     .in({vs, vm, ws, wm, phi_rot, round_dir}),
@@ -48,7 +48,7 @@ always @(posedge clk) begin
         vx <= init_vx;
         vy <= init_vy;
         w <= init_w;
-        imp <= 3'b0;
+        imp <= 2'b0;
     end else if(update) begin
         vx <= vxn;
         vy <= vyn;
