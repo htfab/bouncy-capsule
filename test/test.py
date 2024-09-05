@@ -47,6 +47,9 @@ async def test_project(dut):
         vsync_row = []
         dut._log.info(f"Line {i}")
         for j in range(800):
+            assert dut.uo_out.value.is_resolvable
+            assert dut.uio_out.value.is_resolvable
+            assert dut.uio_oe.value.integer == 0xff
             hsync_row.append(dut.uo_out[7].value.integer)
             vsync_row.append(dut.uo_out[3].value.integer)
             await ClockCycles(dut.clk, 1)

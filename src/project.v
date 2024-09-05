@@ -215,9 +215,10 @@ always @(posedge clk) begin
     vsync_reg <= vsync;
 end
 
+//assign uo_out = {hsync, B[0], G[0], R[0], vsync, B[1], G[1], R[1]};
 assign uo_out = {hsync_reg, B_reg[0], G_reg[0], R_reg[0], vsync_reg, B_reg[1], G_reg[1], R_reg[1]};
 assign uio_out = {(8){pdm_out}};
-assign uio_oe = {8'b1};
+assign uio_oe = 8'b11111111;
 
 wire _unused = &{ena, uio_in};
 
