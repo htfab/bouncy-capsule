@@ -35,11 +35,11 @@ async def resonator_test(dut):
     wf.setframerate(44100)
 
     dut.tension.value = 5
-    dut.trigger.value = 7
+    dut.trigger.value = 3
     await tick()
     dut.trigger.value = 0
     await tick()
-    for i in range(100000):
+    for i in range(10000):
         dut.update.value = 1
         await tick()
         dut.update.value = 0

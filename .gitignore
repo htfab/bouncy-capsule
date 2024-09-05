@@ -14,3 +14,6 @@ fpga/build/
 fpga/.f4cache
 tt/
 .*.swp
+__pycache__/
+sim_build/
+results.xml

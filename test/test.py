@@ -21,7 +21,7 @@ async def test_project(dut):
     dut.rst_n.value = 1
 
     # Basic check for valid vga sync signals
-    dut._log.info("Waiting for hsync and vsync being both zero")
+    dut._log.info("Waiting for hsync and vsync to be both zero")
     for i in range(420000):
         await ClockCycles(dut.clk, 1)
         hsync = dut.uo_out[7].value.integer
@@ -31,7 +31,7 @@ async def test_project(dut):
     else:
         assert False, "hsync and vsync are never both zero"
 
-    dut._log.info("Waiting for hsync and vsync being both one")
+    dut._log.info("Waiting for hsync and vsync to be both one")
     for i in range(420000):
         await ClockCycles(dut.clk, 1)
         hsync = dut.uo_out[7].value.integer

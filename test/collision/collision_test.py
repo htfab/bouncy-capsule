@@ -1,42 +1,44 @@
 import cocotb
 from cocotb.triggers import Timer
 
+from math import sqrt, sin, cos, pi, floor, ceil
 import itertools
 
 splits = [(3, 0, 0), (2, 1, 0), (2, 0, 1), (1, 2, 0), (1, 1, 1), (1, 0, 2), (0, 3, 0), (0, 2, 1), (0, 1, 2), (0, 0, 3)]
-signals = ('ds', 'dm', 'vs', 'vm', 'ws', 'wm', 'vnc', 'wnc', 'ign', 'rxc', 'vxc', 'wxc', 'bz', 'vwm', 'vmn', 'wmn', 'vsn', 'wsn', 'vn', 'wn', 'vxn', 'vyn', 'vxt', 'vyt', 'wt', 'impact')
+signals = ('vx', 'vy', 'w', 'imp', 'phi_rot', 'vs', 'vm', 'ws', 'wm', 'vsn', 'vmn', 'wsn', 'wmn', 'impn', 'vxn', 'vyn', 'wn', 'vxt', 'vyt', 'wt', 'impact')
 
 
 def collision_response(vs, v, ws, w, phi, rd):
-    d = [1, 0, 0, 1][phi % 4]
-    ds = [0, 0, 1, 1][phi % 4]
-
-    if (ws^ds if (d and ((v == 0 and w >= 1) or (v == 1 and w >= 3))) else vs):
-        return (vs, v, ws, w, 0)
-
-    if ds ^ vs ^ ws:
-        if d and w == 0 and v >= 2:
-            wn = v - 2
-            vn = 1
-        else:
-            wn = max(v + w - 1, 0)
-            vn = 0
+    theta = 1.61
+    ve = 2 * v + 1
+    we = 2 * w + 1
+    vq = -sqrt(ve) if vs else sqrt(ve)
+    wq = -sqrt(we/theta) if ws else sqrt(we/theta)
+    pr = (phi/4 + 1/8) * pi
+    cp = cos(pr)
+    j = 2 * (vq + wq*cp) / (1 + cp**2 / theta)
+    j = max(j, 0)
+    vqo = vq - j
+    wqo = wq - j*cp/theta
+    veo = vqo**2
+    weo = wqo**2 * theta
+    assert abs(ve+we-veo-weo) < 1e-6, "Conservation of energy"
+    vo = (veo-1)/2
+    wo = (weo-1)/2
+    vos = 1 if vqo < 0 else 0
+    wos = 1 if wqo < 0 else 0
+    assert abs(v+w-vo-wo) < 1e-6
+    if vo < 0:
+        vr = 0
+    elif vo > v+w:
+        vr = v+w
+    elif rd:
+        vr = int(floor(vo))
     else:
-        if d and v == 0 and w >= 2:
-            vn = w - 2
-            wn = 1
-        else:
-            vn = max(v + w - 1, 0)
-            wn = 0
-
-    vns = ws^ds^1 if (d or ((v == 0 and w >= 1) or (v == 1 and w >= 3))) else vs^1
-    wns = vs^ds^1 if (d or ((w == 0 and v >= 1) or (w == 1 and v >= 3))) else ws
-    if v > 0 or w > 0:
-        wn += rd
-        vn += 1-rd
-    impact = 2*(v+w) + 1
-
-    return (vns, vn, wns, wn, impact)
+        vr = int(ceil(vo))
+    wr = v+w - vr
+    impact = min(max(round(0.647 * j), 1 if j > 1e-6 else 0), 3)
+    return (vos, vr, wos, wr, impact)
 
 
 @cocotb.test()
@@ -81,13 +83,13 @@ async def collision_test(dut):
         dut.round_dir.value = rd
         await delay()
         sig = {name: dut._id(name, extended=False).value for name in signals}
-        impact = int(dut.impact.value)
         await tick()
         dut.update.value = 0
         await tick()
         vxt = int(dut.vxt.value)
         vyt = int(dut.vyt.value)
         wt = int(dut.wt.value)
+        impact = int(dut.impact.value)
         qmap = {8: (0, 0), 14: (0, 1), 18: (0, 2), 21: (0, 3), 56: (1, 0), 50: (1, 1), 46: (1, 2), 43: (1, 3)}
         vxos, vxo = qmap[vxt]
         vyos, vyo = qmap[vyt]
