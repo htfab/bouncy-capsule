@@ -16,6 +16,8 @@ jobs:
       - name: Build GDS
         uses: htfab/tt-gds-action@openlane-2.1.3
         with:
+          tools-repo: htfab/tt-support-tools
+          tools-ref: openlane-2.1.3
           flow: openlane2
 
   precheck:
