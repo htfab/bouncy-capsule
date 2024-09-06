@@ -16,7 +16,7 @@ assert 2**log_size == size
 
 bm = [1 if im[((3*height)//2-i//width)%height, (i+width//2)%width, 0] else 0 for i in range(size)]
 
-f = open('../bitmap.v', 'w')
+f = open('../bitmap_table.v', 'w')
 
 f.write(f"""`default_nettype none
 

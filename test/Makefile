@@ -5,7 +5,7 @@
 SIM ?= icarus
 TOPLEVEL_LANG ?= verilog
 SRC_DIR = $(PWD)/../src
-PROJECT_SOURCES = arc_table.v sine_table.v coll_table.v capsule.v bitmap.v colors.v transform.v kinematics.v collision.v resonator.v orchestrator.v vga_beam.v delta_sigma.v project.v
+PROJECT_SOURCES = arc_table.v sine_table.v coll_table.v bitmap_table.v capsule.v colors.v transform.v kinematics.v collision.v resonator.v orchestrator.v vga_beam.v delta_sigma.v project.v
 
 ifneq ($(GATES),yes)
 
