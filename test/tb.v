@@ -23,13 +23,19 @@ module tb ();
   wire [7:0] uio_out;
   wire [7:0] uio_oe;
 
+`ifdef GL_TEST
+  // Fix from RebelMike
+  wire vpwr = 1'b1 ? 1'b1 : 1'bz;
+  wire vgnd = 1'b1 ? 1'b0 : 1'bz;
+`endif
+
   // Replace tt_um_example with your module name:
   tt_um_htfab_bouncy_capsule user_project (
 
       // Include power ports for the Gate Level test:
 `ifdef GL_TEST
-      .VPWR(1'b1),
-      .VGND(1'b0),
+      .VPWR(vpwr),
+      .VGND(vgnd),
 `endif
 
       .ui_in  (ui_in),    // Dedicated inputs
